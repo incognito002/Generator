@@ -15,8 +15,20 @@ def generar_cvv():
     return str(random.randint(100, 999))
 
 def solicitar_contraseña():
-    # Solicitar la contraseña al usuario
-    contraseña = input(Fore.YELLOW + "Por favor, ingrese la contraseña para acceder al generador de tarjetas: ")
+    # Animación de carga para la solicitud de contraseña
+    print(Fore.GREEN + "Iniciando..." + Style.RESET_ALL)
+    for _ in range(20):
+        print('\r' + Fore.GREEN + "Iniciando " + "." * (_ % 4), end='', flush=True)
+        time.sleep(0.1)
+
+    # Limpiar la terminal
+    os.system('clear' if os.name == 'posix' else 'cls')
+
+    # Solicitar la contraseña al usuario en un cuadro con colores
+    print(Fore.BLUE + "+" + "-" * 38 + "+")
+    print("|" + Fore.YELLOW + "           Ingrese la contraseña          " + Fore.BLUE + "|")
+    print("+" + "-" * 38 + "+" + Style.RESET_ALL)
+    contraseña = input(Fore.CYAN + "Contraseña: ")
     print(Style.RESET_ALL)
     return contraseña
 
@@ -24,14 +36,15 @@ def verificar_contraseña(contraseña):
     # Verificar si la contraseña es correcta
     return contraseña == "032008"
 
+def limpiar_terminal():
+    # Limpiar la terminal
+    os.system('clear' if os.name == 'posix' else 'cls')
+
 def personalizar_terminal():
     # Limpiar la terminal
     os.system('clear' if os.name == 'posix' else 'cls')
 
-    # Inicializar colorama para habilitar el soporte de colores ANSI en la terminal
-    init()
-
-    # Solicitar la contraseña
+    # Resto del código...
     while True:
         contraseña_ingresada = solicitar_contraseña()
         if verificar_contraseña(contraseña_ingresada):
@@ -40,13 +53,26 @@ def personalizar_terminal():
             print(Fore.RED + "Contraseña incorrecta. Por favor, inténtelo de nuevo.")
             print(Style.RESET_ALL)
 
-    # Animación de bienvenida
-    print(Fore.GREEN + "=== Generador de Tarjetas ===")
-    print(Style.RESET_ALL)
-    print(Fore.YELLOW + "Bienvenido al mundo de los generadores de tarjetas!")
-    print(Style.RESET_ALL)
-    print(Fore.YELLOW + "Por favor, ingrese su nombre a continuación:")
-    print(Style.RESET_ALL)
+    # Limpiar la terminal después de ingresar la contraseña correcta
+    os.system('clear' if os.name == 'posix' else 'cls')
+    print(Fore.BLUE + "+" + "-" * 38 + "+")
+    print("|" + Fore.CYAN + "         Generator-CS         " + Fore.BLUE + "|")
+    print("+" + "-" * 38 + "+" + Style.RESET_ALL)
+    print()
+
+    # Animación de bienvenida con borde de colores
+    mensaje_bienvenida = [
+        "=== Generador de Tarjetas ===",
+        "Bienvenido al mundo de los generadores de tarjetas!",
+        "Por favor, ingrese su nombre a continuación:"
+    ]
+    color_borde = Fore.CYAN
+    color_texto = Fore.YELLOW
+    longitud_maxima = max(len(linea) for linea in mensaje_bienvenida)
+    print(color_borde + "+" + "-" * (longitud_maxima + 2) + "+" + Style.RESET_ALL)
+    for linea in mensaje_bienvenida:
+        print(color_borde + "| " + color_texto + linea.ljust(longitud_maxima) + " " * (longitud_maxima - len(linea)) + " " + color_borde + "|" + Style.RESET_ALL)
+    print(color_borde + "+" + "-" * (longitud_maxima + 2) + "+" + Style.RESET_ALL)
 
 def saludo(nombre):
     print(Fore.GREEN + "Felicidades por unirte a este mundo de generadores de tarjetas, " + nombre + "!")
@@ -77,7 +103,7 @@ def generar_tarjeta():
     cvv = input(Fore.CYAN + "CVV: ")
     print(Style.RESET_ALL)
 
-    cantidad = int(input(Fore.CYAN + "¿Cuántas tarjetas desea generar? "))
+    cantidad = int(input(Fore.CYAN + "Número de tarjetas a generar: "))
     print(Style.RESET_ALL)
     print("\nGenerando {} tarjetas:".format(cantidad))
 
@@ -88,8 +114,7 @@ def generar_tarjeta():
             print('\r' + Fore.YELLOW + "Generando tarjetas " + animacion, end='', flush=True)
             time.sleep(0.05)
 
-    print('\r' + Fore.GREEN + "¡Tarjetas generadas con éxito!" + Style.RESET_ALL)
-
+    tarjetas = []
     for _ in range(cantidad):
         if not mes:
             fecha_expiracion = generar_fecha_expiracion()
@@ -102,11 +127,33 @@ def generar_tarjeta():
             cvv_generado = cvv
 
         numero_completo = seis_digitos + generar_numero(10)
-        print("\n" + "-"*40)
-        print("Número de tarjeta:", numero_completo)
-        print("Fecha de expiración:", fecha_expiracion)
-        print("CVV:", cvv_generado)
-        print("-"*40)
+        tarjetas.append((numero_completo, fecha_expiracion, cvv_generado))
+
+    # Limpiar la terminal después de generar las tarjetas
+    limpiar_terminal()
+
+    # Mostrar el mensaje simplificado de éxito
+    print(Fore.GREEN + "Las tarjetas se han generado con éxito." + Style.RESET_ALL)
+
+    # Mostrar las tarjetas generadas
+    for tarjeta in tarjetas:
+        print("\n" + "="*40)
+        print(Fore.CYAN + "Número de tarjeta:", tarjeta[0])
+        print("Fecha de expiración:", tarjeta[1])
+        print("CVV:", tarjeta[2])
+        print("="*40)
+
+    # Ofrecer opciones al usuario
+    while True:
+        opcion = input("\n¿Qué desea hacer?\n1- Volver al inicio\n2- Salir\nOpción: ")
+        if opcion == '1':
+            generar_tarjeta()
+        elif opcion == '2':
+            print("¡Hasta luego!")
+            break
+        else:
+            print(Fore.RED + "Opción no válida. Por favor, elija una opción válida." + Style.RESET_ALL)
 
 if __name__ == "__main__":
     generar_tarjeta()
+          
